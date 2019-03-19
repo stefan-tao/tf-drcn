@@ -79,3 +79,61 @@ def load_svhn(dataset="/home/wogong/Datasets/svhn/svhn.pkl.gz"):
     y_test[idx10] = 0
 
     return (X_train, y_train), (X_test, y_test)
+
+def load_mnist5(dataset="/home/wogong/Datasets/mnist/mnist.pkl.gz"):
+    """
+    Load MNIST handwritten digit images in 32x32.
+    
+    Return:
+	(train_input, train_output), (validation_input, validation_output), (test_input, test_output)
+	
+	in [n, d1, d2, c] format
+    """
+
+    # Load images, in [n, c, d1, d2]
+    f = gzip.open(dataset,'rb')
+    train_set, valid_set, test_set = pickle.load(f)
+    f.close()
+
+    train_set_x, train_set_y = train_set
+    test_set_x, test_set_y = test_set
+    valid_set_x, valid_set_y = valid_set
+  
+    train_set_y = train_set_y.astype('uint8')
+    test_set_y = test_set_y.astype('uint8')
+    valid_set_y = valid_set_y.astype('uint8')
+    
+    # Reshape to [n, d1, d2, c]
+    c = 1
+    d1 = 28
+    d2 = 28
+    ntrain = train_set_x.shape[0]
+    nvalid = valid_set_x.shape[0]
+    ntest = test_set_x.shape[0]
+
+    train_set_x = np.reshape(train_set_x, (ntrain, d1, d2, c)).astype('float32')
+    valid_set_x = np.reshape(valid_set_x, (nvalid, d1, d2, c)).astype('float32')
+    test_set_x = np.reshape(test_set_x, (ntest, d1, d2, c)).astype('float32')
+
+    new_shape = (32, 32, 1)
+    train_set_x_new = np.empty(shape=(ntrain,) + new_shape)
+    valid_set_x_new = np.empty(shape=(nvalid,) + new_shape)
+    test_set_x_new = np.empty(shape=(ntest,) + new_shape)
+
+    for idx in range(ntrain):
+        train_set_x_new[idx] = skimage.transform.resize(train_set_x[idx], new_shape)
+    for idx in range(nvalid):
+        valid_set_x_new[idx] = skimage.transform.resize(valid_set_x[idx], new_shape)
+    for idx in range(ntest):
+        test_set_x_new[idx] = skimage.transform.resize(test_set_x[idx], new_shape)
+
+    random_ids = random.sample(range(0,9), 5 )
+    train_mask = np.isin(train_set_y, random_ids)
+    valid_mask = np.isin(valid_set_y, random_ids)
+    test_mask = np.isin(test_set_y, random_ids)
+
+    X_train, Y_train = train_set_x_new[train_mask], train_set_y[train_mask]
+    X_valid, Y_valid = valid_set_x_new[valid_mask], valid_set_y[valid_mask]
+    X_test, Y_test = test_set_x_new[test_mask], test_set_y[test_mask]
+
+    return (X_train, Y_train), (X_valid, Y_valid), (X_test, Y_test)
