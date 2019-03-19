@@ -36,7 +36,7 @@ save = {
     'test_labels': test['y']
 }
 
-f = open('svhn.pkl', 'wb')
+f = open('svhn_gray.pkl', 'wb')
 pickle.dump(save, f, protocol=pickle.HIGHEST_PROTOCOL)
 f.close()
 
