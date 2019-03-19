@@ -163,7 +163,8 @@ class DRCN(object):
 		self.convae_model = Model(input=_input, output=_xdec)	
 		self.convae_model.compile(loss='mse', optimizer=opt)
 		print(self.convae_model.summary())
-	
+
+
 	def fit_drcn(self, X, Y, Xu, nb_epoch=50, batch_size=128, shuffle=True,
 			validation_data=None, test_data=None, PARAMDIR=None, CONF=None):
 		"""
@@ -326,7 +327,7 @@ class DRCN(object):
 
 
 			# store history
-			HISTPATH = '%s_hist.npy' % CONF
+			HISTPATH = '/home/wogong/Models/tf-drcn/%s_hist.npy' % CONF
 			np.save(HISTPATH, history)
 
 			# visualization 
@@ -345,7 +346,7 @@ class DRCN(object):
 				Xs_pred = np.reshape(Xs_pred, (len(Xs_pred), Xs_pred.shape[3], Xs_pred.shape[1], Xs_pred.shape[2]))
 				show_images(Xs_pred, filename=imgfile)
 
-			if test_data is not  None:
+			if test_data is not None:
 				(X_test, Y_test) = test_data
 				Xtv = X_test[:100]
 				Xt = postprocess_images(Xtv, omin=0, omax=1)
@@ -447,8 +448,7 @@ class DRCN(object):
 			HISTPATH = '%s_hist.npy' % CONF
 			np.save(HISTPATH, history)
 
-		
-	
+
 	def fit_convae(self, X, nb_epoch=50, batch_size=128, shuffle=True,
 		validation_data=None,  test_data=None, PARAMDIR=None, CONF=None):
 		
@@ -497,21 +497,21 @@ class DRCN(object):
 
 
 			# store history
-			HISTPATH = '%s_hist.npy' % CONF
+			HISTPATH = '/home/wogong/Models/tf-drcn/%s_hist.npy' % CONF
 			np.save(HISTPATH, history)
 
 			# visualization 
 			if validation_data is not  None:
 				Xtv = validation_data
 				Xt = postprocess_images(Xtv, omin=0, omax=1)
-				imgfile = '%s_tgt.png' % CONF
+				imgfile = '/home/wogong/Models/tf-drcn/%s_tgt.png' % CONF
 				Xt = np.reshape(Xt, (len(Xt), Xt.shape[3], Xt.shape[1], Xt.shape[2]))
 
 				show_images(Xt, filename=imgfile)
 				
 				Xt_pred = self.convae_model.predict(Xtv)
 				Xt_pred = postprocess_images(Xt_pred, omin=0, omax=1)
-				imgfile = '%s_tgt_pred.png' % CONF
+				imgfile = '/home/wogong/Models/tf-drcn/%s_tgt_pred.png' % CONF
 
 				Xt_pred = np.reshape(Xt_pred, (len(Xt_pred), Xt_pred.shape[3], Xt_pred.shape[1], Xt_pred.shape[2]))
 				show_images(Xt_pred, filename=imgfile)
@@ -519,14 +519,12 @@ class DRCN(object):
 			if test_data is not  None:
 				Xsv = test_data
 				Xs = postprocess_images(Xsv, omin=0, omax=1)
-				imgfile = '%s_src.png' % CONF
+				imgfile = '/home/wogong/Models/tf-drcn/%s_src.png' % CONF
 				Xs = np.reshape(Xs, (len(Xs), Xs.shape[3], Xs.shape[1], Xs.shape[2]))
 				show_images(Xs, filename=imgfile)
 				
 				Xs_pred = self.convae_model.predict(Xsv)
 				Xs_pred = postprocess_images(Xs_pred, omin=0, omax=1)
-				imgfile = '%s_src_pred.png' % CONF
+				imgfile = '/home/wogong/Models/tf-drcn/%s_src_pred.png' % CONF
 				Xs_pred = np.reshape(Xs_pred, (len(Xs_pred), Xs_pred.shape[3], Xs_pred.shape[1], Xs_pred.shape[2]))
 				show_images(Xs_pred, filename=imgfile)
-
-	

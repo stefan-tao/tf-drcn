@@ -17,8 +17,8 @@ from dataset import *
 
 # Load datasets
 print('Load datasets')
-(Xr_train, y_train), (Xr_test, y_test) = load_svhn(dataset='/local/scratch/gif/dataset/SVHN/svhn_gray.pkl.gz') # source
-(_, _), (_, _), (Xr_tgt_test, y_tgt_test) = load_mnist32x32(dataset='/local/scratch/gif/dataset/MNIST/mnist32x32.pkl.gz') # target
+(Xr_train, y_train), (Xr_test, y_test) = load_svhn(dataset="/home/wogong/Datasets/svhn/svhn.pkl.gz") # source
+(_, _), (_, _), (Xr_tgt_test, y_tgt_test) = load_mnist(dataset="/home/wogong/Datasets/mnist/mnist.pkl.gz") # target
 
 # Convert class vectors to binary class matrices
 nb_classes = 10
@@ -29,7 +29,7 @@ Y_tgt_test = np_utils.to_categorical(y_tgt_test, nb_classes)
 # Preprocess input images
 X_train = preprocess_images(Xr_train, tmin=0, tmax=1)
 X_test = preprocess_images(Xr_test, tmin=0, tmax=1)
-X_tgt_test = preprocess_images(Xr_tgt_test, tmin=0, tmax=1)
+X_tgt_test = Xr_tgt_test
 
 print('Create Model')
 drcn = DRCN()
@@ -39,7 +39,7 @@ drcn.create_model(input_shape=input_shape, dense_dim=1024, dy=nb_classes, nb_fil
 		dropout=0.5, bn=False, output_activation='softmax', opt='adam')
 
 print('Train drcn...')
-PARAMDIR = ''
+PARAMDIR = '/home/wogong/Models/tf-drcn'
 CONF = 'svhn-mnist_drcn_v2'
 drcn.fit_drcn(X_train, Y_train, X_tgt_test, validation_data=(X_test, Y_test), 
 		test_data=(X_tgt_test, Y_tgt_test),

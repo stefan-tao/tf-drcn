@@ -2,8 +2,10 @@ import gzip
 
 import cPickle as pickle
 import numpy as np
+import skimage
+import random
 
-def load_mnist32x32(dataset='/local/scratch/gif/dataset/MNIST/mnist32x32.pkl.gz'):
+def load_mnist(dataset="/home/wogong/Datasets/mnist/mnist.pkl.gz"):
     """
     Load MNIST handwritten digit images in 32x32.
     
@@ -28,8 +30,8 @@ def load_mnist32x32(dataset='/local/scratch/gif/dataset/MNIST/mnist32x32.pkl.gz'
     
     # Reshape to [n, d1, d2, c]
     c = 1
-    d1 = 32
-    d2 = 32
+    d1 = 28
+    d2 = 28
     ntrain = train_set_x.shape[0]
     nvalid = valid_set_x.shape[0]
     ntest = test_set_x.shape[0]
@@ -37,10 +39,22 @@ def load_mnist32x32(dataset='/local/scratch/gif/dataset/MNIST/mnist32x32.pkl.gz'
     train_set_x = np.reshape(train_set_x, (ntrain, d1, d2, c)).astype('float32')
     valid_set_x = np.reshape(valid_set_x, (nvalid, d1, d2, c)).astype('float32')
     test_set_x = np.reshape(test_set_x, (ntest, d1, d2, c)).astype('float32')
-    
-    return (train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)
 
-def load_svhn(dataset='/local/scratch/gif/dataset/SVHN/svhn_gray.pkl.gz'):
+    new_shape = (32, 32, 1)
+    train_set_x_new = np.empty(shape=(ntrain,) + new_shape)
+    valid_set_x_new = np.empty(shape=(nvalid,) + new_shape)
+    test_set_x_new = np.empty(shape=(ntest,) + new_shape)
+
+    for idx in range(ntrain):
+        train_set_x_new[idx] = skimage.transform.resize(train_set_x[idx], new_shape)
+    for idx in range(nvalid):
+        valid_set_x_new[idx] = skimage.transform.resize(valid_set_x[idx], new_shape)
+    for idx in range(ntest):
+        test_set_x_new[idx] = skimage.transform.resize(test_set_x[idx], new_shape)
+
+    return (train_set_x_new, train_set_y), (valid_set_x_new, valid_set_y), (test_set_x_new, test_set_y)
+
+def load_svhn(dataset="/home/wogong/Datasets/svhn/svhn.pkl.gz"):
     """
     Load grayscaled SVHN digit images 
 
@@ -49,26 +63,19 @@ def load_svhn(dataset='/local/scratch/gif/dataset/SVHN/svhn_gray.pkl.gz'):
     	
 	in [n, d1, d2, c] format
     """
-    f = gzip.open(dataset,'rb')
-    (X_train, y_train), (X_test, y_test) = pickle.load(f)
+    f = gzip.open(dataset, 'rb')
+    data = pickle.load(f)
     f.close()
+   
+    X_train = data['train_dataset'].astype('float32')
+    y_train = data['train_labels'].astype('uint8') 
+    X_test = data['test_dataset'].astype('float32')
+    y_test = data['test_labels'].astype('uint8') 
 
     idx10 = np.where(y_train == 10)
     y_train[idx10] = 0
 
     idx10 = np.where(y_test == 10)
     y_test[idx10] = 0
-   
-    X_train = X_train.astype('float32')
-    y_train = y_train.astype('uint8') 
-    X_test = X_test.astype('float32')
-    y_test = y_test.astype('uint8')
 
-    # Reshaep to [n, d1, d2, c]
-    [ntrain, c, d1, d2] = X_train.shape
-    ntest = X_test.shape[0]
-
-    X_train = np.reshape(X_train, (ntrain, d1, d2, c))
-    X_test = np.reshape(X_test, (ntest, d1, d2, c))
-	
     return (X_train, y_train), (X_test, y_test)
